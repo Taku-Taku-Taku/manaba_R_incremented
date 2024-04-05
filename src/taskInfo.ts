@@ -1,7 +1,7 @@
 const taskListURLs = {
-  query: "https://ct.ritsumei.ac.jp/s/home_summary_query",
-  survey: "https://ct.ritsumei.ac.jp/s/home_summary_survey",
-  report: "https://ct.ritsumei.ac.jp/s/home_summary_report",
+  query: "https://ct.ritsumei.ac.jp/ct/home_summary_query",
+  survey: "https://ct.ritsumei.ac.jp/ct/home_summary_survey",
+  report: "https://ct.ritsumei.ac.jp/ct/home_summary_report",
 } as const;
 
 export type TaskInfo = {
@@ -23,22 +23,21 @@ const fetchTaskInfo = async (type: TaskType): Promise<TaskInfo[]> => {
   const domparser = new DOMParser();
   const doc = domparser.parseFromString(htmlText, "text/html");
 
-  return Array.from(
-    doc.querySelectorAll(".querylist > li > a, .reportlist > li > a")
-  ).map((a) => {
+  const taskTrs = Array.from(
+    doc.querySelectorAll(".stdlist > tbody > tr")
+  ).filter((e) => !e.classList.contains("title"));
+
+  return taskTrs.map((tr) => {
+    const a = tr.querySelector("a");
     const taskPath = a.getAttribute("href");
     const coursePath = taskPath?.replace(/_[a-z]+_[0-9]+/, "");
 
     return {
       url: taskPath && `https://ct.ritsumei.ac.jp/ct/${taskPath}`,
       courseUrl: coursePath && `https://ct.ritsumei.ac.jp/ct/${coursePath}`,
-      title: a.querySelector("h3")?.innerText.replace(/\s+/g, " "),
-      course: a
-        .querySelector<HTMLParagraphElement>(".info1")
-        ?.innerText.replace(/\s+/g, " "),
-      due: a
-        .querySelector<HTMLParagraphElement>(".info2")
-        ?.innerText.replace("受付終了日時：", ""),
+      title: tr.querySelector("h3")?.innerText.replace(/\s+/g, " "),
+      course: tr.children[1].innerHTML.replace(/\s+/g, " "),
+      due: tr.children[2].innerHTML.replace(/\s+/g, " "),
     };
   });
 };
