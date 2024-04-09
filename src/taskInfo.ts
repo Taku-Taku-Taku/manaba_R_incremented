@@ -23,6 +23,7 @@ const fetchTaskInfo = async (type: TaskType): Promise<TaskInfo[]> => {
   const domparser = new DOMParser();
   const doc = domparser.parseFromString(htmlText, "text/html");
 
+  validateSource(doc);
   const taskTrs = Array.from(
     doc.querySelectorAll(".stdlist > tbody > tr")
   ).filter((e) => !e.classList.contains("title"));
@@ -40,6 +41,33 @@ const fetchTaskInfo = async (type: TaskType): Promise<TaskInfo[]> => {
       due: tr.children[2].innerHTML.replace(/\s+/g, " "),
     };
   });
+};
+
+const validateSource = (doc: Document) => {
+  // タスクのテーブルの要素について検証
+  const trs = doc.querySelectorAll(".stdlist > tbody > tr");
+
+  // 要素が存在することを確認
+  if (trs.length === 0) {
+    throw new Error("Invalid source: task table header not found");
+  }
+
+  // テーブルのヘッダーの内容が正しいことを確認
+  const header = trs[0].children;
+  if (header[0] && header[0]?.innerHTML.replace(/\s+/g, " ") !== "タイトル") {
+    throw new Error("Invalid source: task table does not have タイトル column");
+  }
+  if (header[1] && header[1].innerHTML.replace(/\s+/g, " ") !== "コース名") {
+    throw new Error("Invalid source: task table does not have コース名 column");
+  }
+  if (
+    header[2] &&
+    header[2].innerHTML.replace(/\s+/g, " ") !== "受付終了日時"
+  ) {
+    throw new Error(
+      "Invalid source: task table does not have 受付終了日時 column"
+    );
+  }
 };
 
 export const fetchTasksInfo = async (): Promise<TasksInfo> => {
