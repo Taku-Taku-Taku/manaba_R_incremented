@@ -30,15 +30,15 @@ const fetchTaskInfo = async (type: TaskType): Promise<TaskInfo[]> => {
 
   return taskTrs.map((tr) => {
     const a = tr.querySelector("a");
-    const taskPath = a.getAttribute("href");
+    const taskPath = a?.getAttribute("href");
     const coursePath = taskPath?.replace(/_[a-z]+_[0-9]+/, "");
 
     return {
       url: taskPath && `https://ct.ritsumei.ac.jp/ct/${taskPath}`,
       courseUrl: coursePath && `https://ct.ritsumei.ac.jp/ct/${coursePath}`,
       title: tr.querySelector("h3")?.innerText.replace(/\s+/g, " "),
-      course: tr.children[1].innerHTML.replace(/\s+/g, " "),
-      due: tr.children[2].innerHTML.replace(/\s+/g, " "),
+      course: tr?.children[1]?.innerHTML.replace(/\s+/g, " "),
+      due: tr?.children[2]?.innerHTML.replace(/\s+/g, " "),
     };
   });
 };
@@ -53,7 +53,10 @@ const validateSource = (doc: Document) => {
   }
 
   // テーブルのヘッダーの内容が正しいことを確認
-  const header = trs[0].children;
+  const header = trs[0]?.children;
+  if (typeof header === "undefined") {
+    throw new Error("Invalid source: task table header not found");
+  }
   if (header[0] && header[0]?.innerHTML.replace(/\s+/g, " ") !== "タイトル") {
     throw new Error("Invalid source: task table does not have タイトル column");
   }
