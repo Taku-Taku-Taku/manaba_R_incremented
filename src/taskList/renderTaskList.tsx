@@ -15,7 +15,7 @@ const container = document.createElement("div");
 const parent = document.querySelector(parentSelector);
 
 const kinkyuInfo = document.querySelector(
-  ".contentbody-left .my-infolist-kinkyu"
+  ".contentbody-left .my-infolist-kinkyu",
 );
 
 if (parent !== null) {

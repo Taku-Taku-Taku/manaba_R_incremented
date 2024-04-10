@@ -43,7 +43,7 @@ const compare = <T, ValidT extends T>(
   a: T,
   b: T,
   compareFn: (a: ValidT, b: ValidT) => number,
-  isValid: (x: T) => x is ValidT
+  isValid: (x: T) => x is ValidT,
 ): number => {
   // If `b` is invalid,`b` comes after
   // (regardless of whether `a` is valid or not)
@@ -75,20 +75,20 @@ const getTasks = (tasks: TasksInfo, openedTab: TabKey) => {
           a.due,
           b.due,
           (aDue, bDue) => dayjs(aDue).diff(bDue),
-          (x): x is string => (x != null && dayjs(x).isValid) as boolean
+          (x): x is string => (x != null && dayjs(x).isValid) as boolean,
         ) ||
         compare<TaskInfo["course"], string>(
           a.course,
           b.course,
           compareString,
-          (x): x is string => x != null
+          (x): x is string => x != null,
         ) ||
         compare<TaskInfo["title"], string>(
           a.title,
           b.title,
           compareString,
-          (x): x is string => x != null
-        )
+          (x): x is string => x != null,
+        ),
     );
 };
 
@@ -106,7 +106,7 @@ export const TaskList: FunctionComponent = () => {
 
   useEffect(() => {
     chrome.storage.local.get("taskListShowAll", ({ taskListShowAll }) =>
-      setShowAll(taskListShowAll ?? false)
+      setShowAll(taskListShowAll ?? false),
     );
 
     const callback: Parameters<

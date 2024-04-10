@@ -25,7 +25,7 @@ const fetchTaskInfo = async (type: TaskType): Promise<TaskInfo[]> => {
 
   validateSource(doc);
   const taskTrs = Array.from(
-    doc.querySelectorAll(".stdlist > tbody > tr")
+    doc.querySelectorAll(".stdlist > tbody > tr"),
   ).filter((e) => !e.classList.contains("title"));
 
   return taskTrs.map((tr) => {
@@ -68,14 +68,14 @@ const validateSource = (doc: Document) => {
     header[2].innerHTML.replace(/\s+/g, " ") !== "受付終了日時"
   ) {
     throw new Error(
-      "Invalid source: task table does not have 受付終了日時 column"
+      "Invalid source: task table does not have 受付終了日時 column",
     );
   }
 };
 
 export const fetchTasksInfo = async (): Promise<TasksInfo> => {
   const fetching = (["query", "survey", "report"] as const).map(
-    async (type) => [type, await fetchTaskInfo(type)]
+    async (type) => [type, await fetchTaskInfo(type)],
   );
 
   return Object.fromEntries(await Promise.all(fetching));

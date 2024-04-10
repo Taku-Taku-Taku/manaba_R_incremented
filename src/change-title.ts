@@ -39,7 +39,7 @@ const titleRules: [Rule, Title][] = [
     "syllabus__search",
     () => {
       const query = document.querySelector<HTMLInputElement>(
-        "input#target_word_search"
+        "input#target_word_search",
       )?.value;
       return [query && `"${query}"`, "シラバス検索"];
     },
@@ -48,7 +48,7 @@ const titleRules: [Rule, Title][] = [
     /^syllabus_\d+$/,
     () => [
       document.querySelector<HTMLElement>(
-        "#container > div.pagebody > div > div > div > table > tbody > tr:nth-child(2) > td:nth-child(1)"
+        "#container > div.pagebody > div > div > div > table > tbody > tr:nth-child(2) > td:nth-child(1)",
       )?.innerText,
       "シラバス",
     ],
