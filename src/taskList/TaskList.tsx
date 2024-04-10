@@ -96,6 +96,7 @@ export const TaskList: FunctionComponent = () => {
   const [openedTab, setOpenedTab] = useState<TabKey>("all");
   const [tasks, setTasks] = useState<TasksInfo | undefined>(undefined);
   const [showAll, setShowAll] = useState<boolean>(false);
+  const [isFailedLoading, setIsFailedLoading] = useState<boolean>(false);
 
   const toggleShowAll = useCallback(async () => {
     const newShowAll = !showAll;
@@ -124,9 +125,14 @@ export const TaskList: FunctionComponent = () => {
   }, []);
 
   useEffect(() => {
-    fetchTasksInfo().then((tasksInfo) => {
-      setTasks(tasksInfo);
-    });
+    fetchTasksInfo()
+      .then((tasksInfo) => {
+        setTasks(tasksInfo);
+      })
+      .catch((e) => {
+        console.error("Failed to fetch tasks \n", e);
+        setIsFailedLoading(true);
+      });
   }, []);
 
   const showingTasks = tasks && getTasks(tasks, openedTab);
@@ -149,82 +155,102 @@ export const TaskList: FunctionComponent = () => {
       </ul>
       <div className="my-infolist-body">
         <div className="groupthreadlist" style={{ minHeight: 156 }}>
-          {showingTasks == null && (
-            <p>
-              読み込み中です <span aria-hidden>&gt; 🐤</span>
-            </p>
-          )}
-          {showingTasks != null && showingTasks.length === 0 && (
+          {!isFailedLoading ? (
+            <>
+              {showingTasks == null && (
+                <p>
+                  読み込み中です <span aria-hidden>&gt; 🐤</span>
+                </p>
+              )}
+              {showingTasks != null && showingTasks.length === 0 && (
+                <>
+                  <p>
+                    未提出の課題はありません！
+                    <span aria-hidden>&gt; 🐤</span>
+                  </p>
+                  <p>
+                    良い一日を！
+                    <span aria-hidden>&gt; 🐑</span>
+                  </p>
+                </>
+              )}
+              {showingTasks != null && (
+                <table>
+                  <tbody>
+                    {showingTasks
+                      .slice(0, showAll ? undefined : 5)
+                      .map((task) => (
+                        <tr
+                          key={task.url}
+                          style={
+                            task.due != null ? getRowStyle(task.due) : undefined
+                          }
+                        >
+                          <td
+                            width="15%"
+                            style={
+                              task.due != null &&
+                              dayjs(task.due).diff(dayjs(), "day") < 7
+                                ? { fontWeight: "bold" }
+                                : undefined
+                            }
+                            title={task.due ?? undefined}
+                          >
+                            {task.due && dayjs(task.due).fromNow()}
+                          </td>
+                          <th style={{ backgroundImage: "none", padding: 0 }}>
+                            <div
+                              className="news-title newsentry"
+                              style={{ width: 350 }}
+                            >
+                              <img
+                                src="/icon-coursedeadline-on.png"
+                                className="inline"
+                                alt="未提出の課題"
+                              />
+                              <a
+                                href={task.url ?? ""}
+                                title={task.title ?? ""}
+                                style={{ width: "auto", display: "inline" }}
+                              >
+                                {task.title}
+                              </a>
+                            </div>
+                          </th>
+                          <td>
+                            <div
+                              className="news-courseinfo"
+                              title={task.course ?? undefined}
+                              style={{
+                                width: 200,
+                                overflow: "hidden",
+                                textOverflow: "ellipsis",
+                                whiteSpace: "nowrap",
+                              }}
+                            >
+                              {task.course && (
+                                <a href={task.courseUrl ?? ""}>{task.course}</a>
+                              )}
+                            </div>
+                          </td>
+                        </tr>
+                      ))}
+                  </tbody>
+                </table>
+              )}
+            </>
+          ) : (
             <>
               <p>
-                未提出の課題はありません！
-                <span aria-hidden>&gt; 🐤</span>
+                課題の読み込みに失敗しました <span aria-hidden>🌀</span>
               </p>
               <p>
-                良い一日を！
-                <span aria-hidden>&gt; 🐑</span>
+                <a href="https://github.com/xryuseix/manaba_R_incremented">
+                  manaba+R incremented
+                </a>
+                の開発者にお問い合わせください
               </p>
             </>
-          )}
-          {showingTasks != null && (
-            <table>
-              <tbody>
-                {showingTasks.slice(0, showAll ? undefined : 5).map((task) => (
-                  <tr
-                    key={task.url}
-                    style={task.due != null ? getRowStyle(task.due) : undefined}
-                  >
-                    <td
-                      width="15%"
-                      style={
-                        task.due != null &&
-                        dayjs(task.due).diff(dayjs(), "day") < 7
-                          ? { fontWeight: "bold" }
-                          : undefined
-                      }
-                      title={task.due ?? undefined}
-                    >
-                      {task.due && dayjs(task.due).fromNow()}
-                    </td>
-                    <th style={{ backgroundImage: "none", padding: 0 }}>
-                      <div
-                        className="news-title newsentry"
-                        style={{ width: 350 }}
-                      >
-                        <img
-                          src="/icon-coursedeadline-on.png"
-                          className="inline"
-                          alt="未提出の課題"
-                        />
-                        <a
-                          href={task.url ?? ""}
-                          title={task.title ?? ""}
-                          style={{ width: "auto", display: "inline" }}
-                        >
-                          {task.title}
-                        </a>
-                      </div>
-                    </th>
-                    <td>
-                      <div
-                        className="news-courseinfo"
-                        title={task.course ?? undefined}
-                        style={{
-                          width: 200,
-                          overflow: "hidden",
-                          textOverflow: "ellipsis",
-                          whiteSpace: "nowrap",
-                        }}
-                      >
-                        {task.course && (
-                          <a href={task.courseUrl ?? ""}>{task.course}</a>
-                        )}
-                      </div>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
           )}
         </div>
         <div className="showmore">
