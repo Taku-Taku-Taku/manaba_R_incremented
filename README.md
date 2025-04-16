@@ -25,7 +25,7 @@ manaba+R をほんの少し改善 (increment) する **非公式** Google Chrome
 
 ### ダウンロード
 
-[Release ページ](https://github.com/xryuseix/manaba_R_incremented) から最新のリリースのビルド済み zip ファイルをダウンロードしてください。
+[Release ページ](https://github.com/xryuseix/manaba_R_incremented/releases) から最新のリリースのビルド済み zip ファイルをダウンロードしてください。
 
 ### インストール
 
